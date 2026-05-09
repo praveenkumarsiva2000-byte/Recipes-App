@@ -1,0 +1,204 @@
+{
+  "info": {
+    "name": "Recipes App API",
+    "_postman_id": "recipes-crud-api-v1",
+    "description": "Complete CRUD API for managing recipes built with Node.js, Express.js, and Mongoose.\n\n**Base URL:** `http://localhost:5000`\n\n## Endpoints\n| Method | URL | Description |\n|--------|-----|-------------|\n| POST | /api/recipes | Create a new recipe |\n| GET | /api/recipes | Get all recipes |\n| GET | /api/recipes/:id | Get recipe by ID |\n| PUT | /api/recipes/:id | Update recipe by ID |\n| DELETE | /api/recipes/:id | Delete recipe by ID |",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000",
+      "type": "string",
+      "description": "Change this to your deployed Render URL for production"
+    },
+    {
+      "key": "recipeId",
+      "value": "",
+      "type": "string",
+      "description": "Store a recipe ID here after creating one"
+    }
+  ],
+  "item": [
+    {
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/",
+        "description": "Verify the API server is running."
+      },
+      "response": [
+        {
+          "name": "Server Running",
+          "status": "OK",
+          "code": 200,
+          "body": "{\n  \"success\": true,\n  \"message\": \"🍽️  Recipes API is running\",\n  \"version\": \"1.0.0\",\n  \"endpoints\": {\n    \"recipes\": \"/api/recipes\"\n  }\n}"
+        }
+      ]
+    },
+    {
+      "name": "1. Create Recipe",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/recipes",
+        "description": "**createRecipe** — Creates a new recipe document in MongoDB.\n\n### Required Fields\n- `title` (string, max 100 chars)\n- `description` (string, max 500 chars)\n- `ingredients` (array of strings, min 1 item)\n- `instructions` (string)\n- `category` (enum: Breakfast | Lunch | Dinner | Snack | Dessert | Beverage | Other)\n- `prepTime` (number, minutes)\n- `cookTime` (number, minutes)\n- `servings` (number, min 1)\n\n### Optional Fields\n- `difficulty` (enum: Easy | Medium | Hard, default: Easy)\n- `imageUrl` (string)",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Classic Spaghetti Carbonara\",\n  \"description\": \"A rich and creamy Italian pasta dish made with eggs, cheese, pancetta, and black pepper.\",\n  \"ingredients\": [\n    \"400g spaghetti\",\n    \"200g pancetta or guanciale\",\n    \"4 large eggs\",\n    \"100g Pecorino Romano cheese\",\n    \"50g Parmesan cheese\",\n    \"2 cloves garlic\",\n    \"Salt and black pepper to taste\"\n  ],\n  \"instructions\": \"1. Cook spaghetti in salted boiling water until al dente.\\n2. Fry pancetta with garlic until crispy.\\n3. Whisk eggs with grated cheeses.\\n4. Reserve pasta water, drain pasta.\\n5. Off heat, mix pasta with pancetta, then egg mixture.\\n6. Add pasta water to achieve creamy texture.\\n7. Season generously with black pepper and serve.\",\n  \"category\": \"Dinner\",\n  \"prepTime\": 10,\n  \"cookTime\": 20,\n  \"servings\": 4,\n  \"difficulty\": \"Medium\",\n  \"imageUrl\": \"https://example.com/carbonara.jpg\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "response": [
+        {
+          "name": "201 - Recipe Created",
+          "status": "Created",
+          "code": 201,
+          "body": "{\n  \"success\": true,\n  \"message\": \"Recipe created successfully\",\n  \"data\": {\n    \"_id\": \"665a1b2c3d4e5f6789012345\",\n    \"title\": \"Classic Spaghetti Carbonara\",\n    \"description\": \"A rich and creamy Italian pasta dish made with eggs, cheese, pancetta, and black pepper.\",\n    \"ingredients\": [\n      \"400g spaghetti\",\n      \"200g pancetta or guanciale\",\n      \"4 large eggs\",\n      \"100g Pecorino Romano cheese\",\n      \"50g Parmesan cheese\",\n      \"2 cloves garlic\",\n      \"Salt and black pepper to taste\"\n    ],\n    \"instructions\": \"1. Cook spaghetti...\",\n    \"category\": \"Dinner\",\n    \"prepTime\": 10,\n    \"cookTime\": 20,\n    \"servings\": 4,\n    \"difficulty\": \"Medium\",\n    \"imageUrl\": \"https://example.com/carbonara.jpg\",\n    \"createdAt\": \"2024-06-01T10:00:00.000Z\",\n    \"updatedAt\": \"2024-06-01T10:00:00.000Z\",\n    \"__v\": 0\n  }\n}"
+        },
+        {
+          "name": "400 - Validation Error",
+          "status": "Bad Request",
+          "code": 400,
+          "body": "{\n  \"success\": false,\n  \"message\": \"Validation failed\",\n  \"errors\": [\n    \"Recipe title is required\",\n    \"At least one ingredient is required\"\n  ]\n}"
+        }
+      ]
+    },
+    {
+      "name": "2. Get All Recipes",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/api/recipes",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "recipes"],
+          "query": [
+            {
+              "key": "category",
+              "value": "Dinner",
+              "description": "Filter by category (optional)",
+              "disabled": true
+            },
+            {
+              "key": "difficulty",
+              "value": "Easy",
+              "description": "Filter by difficulty (optional)",
+              "disabled": true
+            },
+            {
+              "key": "search",
+              "value": "pasta",
+              "description": "Search by title keyword (optional)",
+              "disabled": true
+            }
+          ]
+        },
+        "description": "**getAllRecipes** — Retrieves all recipes from the database, sorted by newest first.\n\n### Query Parameters (all optional)\n- `category` — Filter by category (e.g. `Dinner`, `Breakfast`)\n- `difficulty` — Filter by difficulty (`Easy`, `Medium`, `Hard`)\n- `search` — Search by title keyword (case-insensitive)"
+      },
+      "response": [
+        {
+          "name": "200 - All Recipes",
+          "status": "OK",
+          "code": 200,
+          "body": "{\n  \"success\": true,\n  \"count\": 2,\n  \"data\": [\n    {\n      \"_id\": \"665a1b2c3d4e5f6789012345\",\n      \"title\": \"Classic Spaghetti Carbonara\",\n      \"description\": \"A rich and creamy Italian pasta dish.\",\n      \"ingredients\": [\"400g spaghetti\", \"200g pancetta\"],\n      \"category\": \"Dinner\",\n      \"prepTime\": 10,\n      \"cookTime\": 20,\n      \"servings\": 4,\n      \"difficulty\": \"Medium\",\n      \"createdAt\": \"2024-06-01T10:00:00.000Z\",\n      \"updatedAt\": \"2024-06-01T10:00:00.000Z\"\n    },\n    {\n      \"_id\": \"665a1b2c3d4e5f6789099999\",\n      \"title\": \"Avocado Toast\",\n      \"description\": \"Quick healthy breakfast.\",\n      \"ingredients\": [\"2 slices sourdough\", \"1 avocado\"],\n      \"category\": \"Breakfast\",\n      \"prepTime\": 5,\n      \"cookTime\": 3,\n      \"servings\": 1,\n      \"difficulty\": \"Easy\",\n      \"createdAt\": \"2024-05-30T08:00:00.000Z\",\n      \"updatedAt\": \"2024-05-30T08:00:00.000Z\"\n    }\n  ]\n}"
+        }
+      ]
+    },
+    {
+      "name": "3. Get Recipe by ID",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/api/recipes/{{recipeId}}",
+        "description": "**getRecipeById** — Retrieves a single recipe by its MongoDB ObjectId.\n\n### URL Parameter\n- `:id` — The MongoDB ObjectId of the recipe (24-character hex string)"
+      },
+      "response": [
+        {
+          "name": "200 - Recipe Found",
+          "status": "OK",
+          "code": 200,
+          "body": "{\n  \"success\": true,\n  \"data\": {\n    \"_id\": \"665a1b2c3d4e5f6789012345\",\n    \"title\": \"Classic Spaghetti Carbonara\",\n    \"description\": \"A rich and creamy Italian pasta dish made with eggs, cheese, pancetta, and black pepper.\",\n    \"ingredients\": [\n      \"400g spaghetti\",\n      \"200g pancetta or guanciale\",\n      \"4 large eggs\"\n    ],\n    \"instructions\": \"1. Cook spaghetti in salted boiling water until al dente...\",\n    \"category\": \"Dinner\",\n    \"prepTime\": 10,\n    \"cookTime\": 20,\n    \"servings\": 4,\n    \"difficulty\": \"Medium\",\n    \"imageUrl\": \"https://example.com/carbonara.jpg\",\n    \"createdAt\": \"2024-06-01T10:00:00.000Z\",\n    \"updatedAt\": \"2024-06-01T10:00:00.000Z\"\n  }\n}"
+        },
+        {
+          "name": "404 - Recipe Not Found",
+          "status": "Not Found",
+          "code": 404,
+          "body": "{\n  \"success\": false,\n  \"message\": \"Recipe not found with ID: 665a1b2c3d4e5f6789012345\"\n}"
+        },
+        {
+          "name": "400 - Invalid ID Format",
+          "status": "Bad Request",
+          "code": 400,
+          "body": "{\n  \"success\": false,\n  \"message\": \"Invalid recipe ID format\"\n}"
+        }
+      ]
+    },
+    {
+      "name": "4. Update Recipe",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/recipes/{{recipeId}}",
+        "description": "**updateRecipe** — Updates an existing recipe by its ID. Only include fields you want to change.\n\n### URL Parameter\n- `:id` — The MongoDB ObjectId of the recipe\n\n### Body\nSend only the fields you wish to update. All schema validations still apply.",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Classic Spaghetti Carbonara (Updated)\",\n  \"servings\": 6,\n  \"difficulty\": \"Hard\",\n  \"description\": \"An authentic Roman pasta dish — richer and even more delicious.\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "response": [
+        {
+          "name": "200 - Recipe Updated",
+          "status": "OK",
+          "code": 200,
+          "body": "{\n  \"success\": true,\n  \"message\": \"Recipe updated successfully\",\n  \"data\": {\n    \"_id\": \"665a1b2c3d4e5f6789012345\",\n    \"title\": \"Classic Spaghetti Carbonara (Updated)\",\n    \"description\": \"An authentic Roman pasta dish — richer and even more delicious.\",\n    \"ingredients\": [\"400g spaghetti\", \"200g pancetta\"],\n    \"category\": \"Dinner\",\n    \"prepTime\": 10,\n    \"cookTime\": 20,\n    \"servings\": 6,\n    \"difficulty\": \"Hard\",\n    \"createdAt\": \"2024-06-01T10:00:00.000Z\",\n    \"updatedAt\": \"2024-06-01T11:30:00.000Z\"\n  }\n}"
+        },
+        {
+          "name": "404 - Recipe Not Found",
+          "status": "Not Found",
+          "code": 404,
+          "body": "{\n  \"success\": false,\n  \"message\": \"Recipe not found with ID: 665a1b2c3d4e5f6789012345\"\n}"
+        }
+      ]
+    },
+    {
+      "name": "5. Delete Recipe",
+      "request": {
+        "method": "DELETE",
+        "url": "{{baseUrl}}/api/recipes/{{recipeId}}",
+        "description": "**deleteRecipe** — Permanently deletes a recipe by its ID.\n\n### URL Parameter\n- `:id` — The MongoDB ObjectId of the recipe to delete\n\n> ⚠️ This action is irreversible."
+      },
+      "response": [
+        {
+          "name": "200 - Recipe Deleted",
+          "status": "OK",
+          "code": 200,
+          "body": "{\n  \"success\": true,\n  \"message\": \"Recipe deleted successfully\",\n  \"data\": {}\n}"
+        },
+        {
+          "name": "404 - Recipe Not Found",
+          "status": "Not Found",
+          "code": 404,
+          "body": "{\n  \"success\": false,\n  \"message\": \"Recipe not found with ID: 665a1b2c3d4e5f6789012345\"\n}"
+        }
+      ]
+    }
+  ]
+}
