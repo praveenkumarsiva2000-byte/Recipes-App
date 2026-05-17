@@ -1,5 +1,10 @@
 # 🍽️ Recipes App — CRUD API
 
+## 🚀 Live Demo
+- **Deployed URL:** https://recipes-app-1m5d.onrender.com
+- **GitHub:** https://github.com/praveenkumarsiva2000-byte/Recipes-App
+- **Postman Docs:** https://documenter.getpostman.com/view/54651339/2sBXqRiGjj
+
 A complete RESTful CRUD API for managing recipes built with **Node.js**, **Express.js**, and **Mongoose (MongoDB)**, following the **MVC pattern**.
 
 ---
